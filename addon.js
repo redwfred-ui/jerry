@@ -1,15 +1,18 @@
 const { addonBuilder, serveHTTP } = require("stremio-addon-sdk");
 
 // =========================================================
-// GOOGLE CDN IMAGE (رابط جوجل الذكي الذي لا يُحظر أبداً)
+// IMAGES (روابط ثابتة وسريعة لا تُحظر على Stremio)
 // =========================================================
 const CUSTOM_POSTER = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuK5if6QyAKZnww7eUfkuadjVCmvodizQnPQSfvEypEQ&s=10";
 const BACKGROUND_IMAGE = "https://images.wallpapersden.com/image/download/tom-and-jerry-art_bGdpZm2UmZqaraWkpJRmZmdlrWZnZWU.jpg";
 const LOGO_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Tom_and_Jerry_logo.svg/1200px-Tom_and_Jerry_logo.svg.png";
 
+// الهاش الأصلي للتورنت (161 حلقة)
 const MAGNET_HASH = "3d82de91e551c7c30ef00ed0e9b6bbe4f8f943df";
 
-// قاعدة بيانات الحلقات الـ 161 الكلاسيكية كاملة
+// =========================================================
+// 161 CLASSIC EPISODES (قائمة 161 حلقة بالترتيب والتواريخ)
+// =========================================================
 const CLASSIC_EPISODES = [
     { ep: 1, title: "Puss Gets the Boot", date: "1940-02-10" },
     { ep: 2, title: "The Midnight Snack", date: "1941-07-19" },
@@ -174,9 +177,12 @@ const CLASSIC_EPISODES = [
     { ep: 161, title: "Purr-Chance to Dream", date: "1967-09-08" }
 ];
 
+// =========================================================
+// MANIFEST (الإصدار v11 لفرض مسح الكاش من Stremio)
+// =========================================================
 const manifest = {
-    id: "org.tomandjerry.classic161.v10",
-    version: "10.0.0",
+    id: "org.tomandjerry.classic161.v11",
+    version: "11.0.0",
     name: "Tom & Jerry Classic Collection",
     description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة).",
     resources: ["catalog", "meta", "stream"],
@@ -193,24 +199,32 @@ const manifest = {
 
 const builder = new addonBuilder(manifest);
 
+// =========================================================
+// CATALOG HANDLER
+// =========================================================
 builder.defineCatalogHandler(({ type, id }) => {
     if (type === "series" && id === "tj_classic_catalog") {
         return Promise.resolve({
-            metas: [{
-                id: "tj_161_series",
-                type: "series",
-                name: "Tom and Jerry - Complete 161 Episodes",
-                poster: CUSTOM_POSTER,
-                posterShape: "poster",
-                background: BACKGROUND_IMAGE,
-                logo: LOGO_IMAGE,
-                description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة)."
-            }]
+            metas: [
+                {
+                    id: "tj_161_series",
+                    type: "series",
+                    name: "Tom and Jerry - Complete 161 Episodes",
+                    poster: CUSTOM_POSTER,
+                    posterShape: "poster",
+                    background: BACKGROUND_IMAGE,
+                    logo: LOGO_IMAGE,
+                    description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة)."
+                }
+            ]
         });
     }
     return Promise.resolve({ metas: [] });
 });
 
+// =========================================================
+// META HANDLER
+// =========================================================
 builder.defineMetaHandler(({ type, id }) => {
     if (type === "series" && id === "tj_161_series") {
         const videos = CLASSIC_EPISODES.map(epData => {
@@ -243,24 +257,36 @@ builder.defineMetaHandler(({ type, id }) => {
     return Promise.resolve({ meta: null });
 });
 
+// =========================================================
+// STREAM HANDLER (سيرفر التورنت / PirateBay)
+// =========================================================
 builder.defineStreamHandler(({ type, id }) => {
     if (type === "series" && id.startsWith("tj_161_series:")) {
         const parts = id.split(":");
         const episodeNumber = parseInt(parts[2], 10);
 
         if (episodeNumber >= 1 && episodeNumber <= CLASSIC_EPISODES.length) {
+            // fileIdx تبدأ من 0 (الحلقة الأولى = Index 0)
+            const fileIndex = episodeNumber - 1;
+
             return Promise.resolve({
-                streams: [{
-                    title: `Tom & Jerry - Episode ${episodeNumber} (DVD-Rip)`,
-                    infoHash: MAGNET_HASH,
-                    fileIdx: episodeNumber - 1
-                }]
+                streams: [
+                    {
+                        title: `PirateBay Torrent - Episode ${episodeNumber} (720p/1080p)`,
+                        infoHash: MAGNET_HASH,
+                        fileIdx: fileIndex
+                    }
+                ]
             });
         }
     }
+
     return Promise.resolve({ streams: [] });
 });
 
+// =========================================================
+// SERVER
+// =========================================================
 const port = parseInt(process.env.PORT, 10) || 7070;
 serveHTTP(builder.getInterface(), { port: port });
 console.log(`Tom & Jerry Stremio Addon active on port ${port}`);
