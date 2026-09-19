@@ -1,9 +1,9 @@
 const { addonBuilder, serveHTTP } = require("stremio-addon-sdk");
 
-// 1. رابط بوستر موثوق وعالي الجودة من IMDb/Amazon لضمان عدم ظهور شاشة سوداء
-const CUSTOM_POSTER = "https://m.media-amazon.com/images/M/MV5BYzA2Nzk5M2EtMjEwYS00OWE4LTgyMWUtMzA5ZmVkMTA3YjJiXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg";
+// رابط مباشر وموثوق للصورة المرفقة (يعمل كبوستر وخلفية وصورة لكل الحلقات بدون حظر)
+const CUSTOM_POSTER = "https://i.postimg.cc/85z1Nq8C/tom-jerry.jpg";
 
-// 2. قاعدة بيانات الحلقات الكلاسيكية الـ 161 كاملة من 1 إلى 161
+// قاعدة بيانات الحلقات الـ 161 الكلاسيكية كاملة
 const CLASSIC_EPISODES = [
     { ep: 1, title: "Puss Gets the Boot", date: "1940-02-10" },
     { ep: 2, title: "The Midnight Snack", date: "1941-07-19" },
@@ -168,12 +168,12 @@ const CLASSIC_EPISODES = [
     { ep: 161, title: "Purr-Chance to Dream", date: "1967-09-08" }
 ];
 
-// 3. Manifest الإضافة (تحديد رقم v3.0.0 لمسح الكاش)
+// Manifest المحدث مع رفع الإصدار لتحديث الكاش
 const manifest = {
-    id: "org.tomandjerry.classic161.v3",
-    version: "3.0.0",
+    id: "org.tomandjerry.classic161.v4",
+    version: "4.0.0",
     name: "Tom & Jerry Classic Collection",
-    description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة) مع الأسماء والتواريخ الأصلية الدقيقة.",
+    description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة).",
     resources: ["catalog", "meta", "stream"],
     types: ["series"],
     catalogs: [
@@ -188,7 +188,7 @@ const manifest = {
 const builder = new addonBuilder(manifest);
 const MAGNET_HASH = "3d82de91e551c7c30ef00ed0e9b6bbe4f8f943df";
 
-// 4. Catalog Handler
+// 1. Catalog Handler (بوستر وخلفية الكتالوج)
 builder.defineCatalogHandler(({ type, id }) => {
     if (type === "series" && id === "tj_classic_catalog") {
         return Promise.resolve({
@@ -198,14 +198,14 @@ builder.defineCatalogHandler(({ type, id }) => {
                 name: "Tom and Jerry - Complete 161 Episodes",
                 poster: CUSTOM_POSTER,
                 background: CUSTOM_POSTER,
-                description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة بدقة عالية)."
+                description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة)."
             }]
         });
     }
     return Promise.resolve({ metas: [] });
 });
 
-// 5. Meta Handler (ربط جميع الحلقات الـ 161 بأسماؤها وتواريخها)
+// 2. Meta Handler (تثبيت الصورة الموحدة لصفحة العمل وجميع الحلقات)
 builder.defineMetaHandler(({ type, id }) => {
     if (type === "series" && id === "tj_161_series") {
         const videos = CLASSIC_EPISODES.map(epData => {
@@ -227,6 +227,7 @@ builder.defineMetaHandler(({ type, id }) => {
                 name: "Tom and Jerry - Complete 161 Episodes",
                 poster: CUSTOM_POSTER,
                 background: CUSTOM_POSTER,
+                logo: CUSTOM_POSTER,
                 description: "المجموعة الكلاسيكية الكاملة 161 حلقة متسلسلة ومشغلة مباشرة.",
                 videos: videos
             }
@@ -235,7 +236,7 @@ builder.defineMetaHandler(({ type, id }) => {
     return Promise.resolve({ meta: null });
 });
 
-// 6. Stream Handler
+// 3. Stream Handler
 builder.defineStreamHandler(({ type, id }) => {
     if (type === "series" && id.startsWith("tj_161_series:")) {
         const parts = id.split(":");
@@ -254,7 +255,7 @@ builder.defineStreamHandler(({ type, id }) => {
     return Promise.resolve({ streams: [] });
 });
 
-// 7. تشغيل السيرفر
+// تشغيل السيرفر
 const port = parseInt(process.env.PORT, 10) || 7070;
 serveHTTP(builder.getInterface(), { port: port });
 console.log(`Stremio Addon active on port ${port}`);
