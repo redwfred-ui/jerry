@@ -1,9 +1,12 @@
 const { addonBuilder, serveHTTP } = require("stremio-addon-sdk");
 
-// رابط مباشر وموثوق للصورة المرفقة (يعمل كبوستر وخلفية وصورة لكل الحلقات بدون حظر)
-const CUSTOM_POSTER = "https://i.postimg.cc/85z1Nq8C/tom-jerry.jpg";
+// رابط مباشر دائم لنفس الصورة الكلاسيكية التي أرفقتها (شاشة البداية الحمراء لتوم وجيري)
+const CUSTOM_POSTER = "https://upload.wikimedia.org/wikipedia/en/2/2f/Tom_and_Jerry_title_card.png";
 
-// قاعدة بيانات الحلقات الـ 161 الكلاسيكية كاملة
+// هاش التورنت الخاص بـ 161 حلقة كلاسيكية
+const MAGNET_HASH = "3d82de91e551c7c30ef00ed0e9b6bbe4f8f943df";
+
+// قائمة الـ 161 حلقة الكلاسيكية كاملة
 const CLASSIC_EPISODES = [
     { ep: 1, title: "Puss Gets the Boot", date: "1940-02-10" },
     { ep: 2, title: "The Midnight Snack", date: "1941-07-19" },
@@ -168,10 +171,9 @@ const CLASSIC_EPISODES = [
     { ep: 161, title: "Purr-Chance to Dream", date: "1967-09-08" }
 ];
 
-// Manifest المحدث مع رفع الإصدار لتحديث الكاش
 const manifest = {
-    id: "org.tomandjerry.classic161.v4",
-    version: "4.0.0",
+    id: "org.tomandjerry.classic161.v7",
+    version: "7.0.0",
     name: "Tom & Jerry Classic Collection",
     description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة).",
     resources: ["catalog", "meta", "stream"],
@@ -186,9 +188,8 @@ const manifest = {
 };
 
 const builder = new addonBuilder(manifest);
-const MAGNET_HASH = "3d82de91e551c7c30ef00ed0e9b6bbe4f8f943df";
 
-// 1. Catalog Handler (بوستر وخلفية الكتالوج)
+// 1. Catalog Handler
 builder.defineCatalogHandler(({ type, id }) => {
     if (type === "series" && id === "tj_classic_catalog") {
         return Promise.resolve({
@@ -205,7 +206,7 @@ builder.defineCatalogHandler(({ type, id }) => {
     return Promise.resolve({ metas: [] });
 });
 
-// 2. Meta Handler (تثبيت الصورة الموحدة لصفحة العمل وجميع الحلقات)
+// 2. Meta Handler
 builder.defineMetaHandler(({ type, id }) => {
     if (type === "series" && id === "tj_161_series") {
         const videos = CLASSIC_EPISODES.map(epData => {
