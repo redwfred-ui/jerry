@@ -1,16 +1,16 @@
 const { addonBuilder, serveHTTP } = require("stremio-addon-sdk");
 
 // =========================================================
-// POSTER & MEDIA IMAGES (روابط مباشرة ومضمونة على Stremio)
+// POSTER & MEDIA IMAGES (روابط TMDB المباشرة والمدعومة)
 // =========================================================
 
-// بوستر طولي عالي الجودة للكتالوج والمسلسل
-const CUSTOM_POSTER = "https://image.tmdb.org/t/p/w500/8bA8l1C9bJ9Zp9u4x6Y7x8Z9q0k.jpg"; 
+// بوستر طولي للمسلسل والكتالوج
+const CUSTOM_POSTER = "https://image.tmdb.org/t/p/w500/eWW25mOnbXq9C0W4mXq62X1J3I0.jpg"; 
 
-// خلفية شاشة البداية الحمراء الكلاسيكية
-const BACKGROUND_IMAGE = "https://upload.wikimedia.org/wikipedia/en/5/5f/Tom_and_Jerry_title_card.png";
+// خلفية عريضة لصفحة التفاصيل والحلقات
+const BACKGROUND_IMAGE = "https://image.tmdb.org/t/p/w1280/8bA8l1C9bJ9Zp9u4x6Y7x8Z9q0k.jpg";
 
-// هاش التورنت الخاص بـ 161 حلقة كلاسيكية
+// هاش التورنت الخاص بالحلقات
 const MAGNET_HASH = "3d82de91e551c7c30ef00ed0e9b6bbe4f8f943df";
 
 // =========================================================
@@ -182,12 +182,12 @@ const CLASSIC_EPISODES = [
 ];
 
 // =========================================================
-// MANIFEST
+// MANIFEST (تمت تغيير المعرف v9 لتخطّي كاش Stremio)
 // =========================================================
 
 const manifest = {
-    id: "org.tomandjerry.classic161.v8",
-    version: "8.0.0",
+    id: "org.tomandjerry.classic161.v9",
+    version: "9.0.0",
     name: "Tom & Jerry Classic Collection",
     description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة).",
     resources: ["catalog", "meta", "stream"],
@@ -264,7 +264,7 @@ builder.defineMetaHandler(({ type, id }) => {
 });
 
 // =========================================================
-// STREAM HANDLER (ربط التورنت الشغال)
+// STREAM HANDLER
 // =========================================================
 
 builder.defineStreamHandler(({ type, id }) => {
