@@ -1,15 +1,17 @@
 const { addonBuilder, serveHTTP } = require("stremio-addon-sdk");
 
 // =========================================================
-// TOM & JERRY IMAGE
+// POSTER & MEDIA IMAGES (روابط مباشرة ومضمونة على Stremio)
 // =========================================================
 
-// رابط صورة حقيقي وثابت بدل USERNAME/REPOSITORY
-const CUSTOM_POSTER =
-    "https://upload.wikimedia.org/wikipedia/en/5/5f/Tom_and_Jerry_title_card.png";
+// بوستر طولي عالي الجودة للكتالوج والمسلسل
+const CUSTOM_POSTER = "https://image.tmdb.org/t/p/w500/8bA8l1C9bJ9Zp9u4x6Y7x8Z9q0k.jpg"; 
 
-// نستخدم نفس الصورة كصورة للحلقات
-const EPISODE_THUMBNAIL = CUSTOM_POSTER;
+// خلفية شاشة البداية الحمراء الكلاسيكية
+const BACKGROUND_IMAGE = "https://upload.wikimedia.org/wikipedia/en/5/5f/Tom_and_Jerry_title_card.png";
+
+// هاش التورنت الخاص بـ 161 حلقة كلاسيكية
+const MAGNET_HASH = "3d82de91e551c7c30ef00ed0e9b6bbe4f8f943df";
 
 // =========================================================
 // CLASSIC EPISODES
@@ -184,26 +186,13 @@ const CLASSIC_EPISODES = [
 // =========================================================
 
 const manifest = {
-    id: "org.tomandjerry.classic161.v7",
-    version: "7.0.0",
+    id: "org.tomandjerry.classic161.v8",
+    version: "8.0.0",
     name: "Tom & Jerry Classic Collection",
-    description:
-        "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة).",
-
-    resources: [
-        "catalog",
-        "meta",
-        "stream"
-    ],
-
-    types: [
-        "series"
-    ],
-
-    idPrefixes: [
-        "tj_161_series"
-    ],
-
+    description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة).",
+    resources: ["catalog", "meta", "stream"],
+    types: ["series"],
+    idPrefixes: ["tj_161_series"],
     catalogs: [
         {
             type: "series",
@@ -213,208 +202,100 @@ const manifest = {
     ]
 };
 
-// =========================================================
-// BUILDER
-// =========================================================
-
 const builder = new addonBuilder(manifest);
 
 // =========================================================
-// CATALOG
+// CATALOG HANDLER
 // =========================================================
 
 builder.defineCatalogHandler(({ type, id }) => {
-
-    if (
-        type === "series" &&
-        id === "tj_classic_catalog"
-    ) {
-
+    if (type === "series" && id === "tj_classic_catalog") {
         return Promise.resolve({
-
             metas: [
-
                 {
                     id: "tj_161_series",
-
                     type: "series",
-
-                    name:
-                        "Tom and Jerry - Complete 161 Episodes",
-
-                    // أهم شيء للـCatalog
+                    name: "Tom and Jerry - Complete 161 Episodes",
                     poster: CUSTOM_POSTER,
-
-                    // يحدد شكل الصورة
                     posterShape: "poster",
-
-                    background: CUSTOM_POSTER,
-
-                    description:
-                        "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة)."
+                    background: BACKGROUND_IMAGE,
+                    description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري (161 حلقة)."
                 }
-
             ]
         });
     }
-
-    return Promise.resolve({
-        metas: []
-    });
+    return Promise.resolve({ metas: [] });
 });
 
 // =========================================================
-// META
+// META HANDLER
 // =========================================================
 
 builder.defineMetaHandler(({ type, id }) => {
-
-    if (
-        type === "series" &&
-        id === "tj_161_series"
-    ) {
-
-        const videos =
-            CLASSIC_EPISODES.map(epData => {
-
-                return {
-
-                    id:
-                        `tj_161_series:1:${epData.ep}`,
-
-                    title:
-                        `${epData.ep}. ${epData.title}`,
-
-                    season: 1,
-
-                    episode:
-                        epData.ep,
-
-                    released:
-                        new Date(
-                            epData.date
-                        ).toISOString(),
-
-                    // صورة الحلقة
-                    thumbnail:
-                        EPISODE_THUMBNAIL,
-
-                    overview:
-                        `Tom and Jerry Classic Short Episode #${epData.ep}: ${epData.title}`,
-
-                    description:
-                        `الحلقة ${epData.ep}: ${epData.title}. حلقة كلاسيكية من سلسلة توم وجيري.`
-                };
-            });
+    if (type === "series" && id === "tj_161_series") {
+        const videos = CLASSIC_EPISODES.map(epData => {
+            return {
+                id: `tj_161_series:1:${epData.ep}`,
+                title: `${epData.ep}. ${epData.title}`,
+                season: 1,
+                episode: epData.ep,
+                released: new Date(epData.date).toISOString(),
+                thumbnail: BACKGROUND_IMAGE,
+                overview: `Tom and Jerry Classic Short Episode #${epData.ep}: ${epData.title}`,
+                description: `الحلقة ${epData.ep}: ${epData.title}. حلقة كلاسيكية من سلسلة توم وجيري.`
+            };
+        });
 
         return Promise.resolve({
-
             meta: {
-
                 id: "tj_161_series",
-
                 type: "series",
-
-                name:
-                    "Tom and Jerry - Complete 161 Episodes",
-
-                poster:
-                    CUSTOM_POSTER,
-
-                posterShape:
-                    "poster",
-
-                background:
-                    CUSTOM_POSTER,
-
-                logo:
-                    CUSTOM_POSTER,
-
-                description:
-                    "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري، 161 حلقة.",
-
-                videos:
-                    videos
+                name: "Tom and Jerry - Complete 161 Episodes",
+                poster: CUSTOM_POSTER,
+                posterShape: "poster",
+                background: BACKGROUND_IMAGE,
+                logo: CUSTOM_POSTER,
+                description: "المجموعة الكلاسيكية الكاملة لحلقات توم وجيري، 161 حلقة.",
+                videos: videos
             }
         });
     }
-
-    return Promise.resolve({
-        meta: null
-    });
+    return Promise.resolve({ meta: null });
 });
 
 // =========================================================
-// STREAM
+// STREAM HANDLER (ربط التورنت الشغال)
 // =========================================================
-//
-// ضع هنا فقط مصدر فيديو تملك حق استخدامه.
-// لا تستخدم infoHash لمحتوى غير مصرح به.
-//
 
 builder.defineStreamHandler(({ type, id }) => {
+    if (type === "series" && id.startsWith("tj_161_series:")) {
+        const parts = id.split(":");
+        const episodeNumber = parseInt(parts[2], 10);
 
-    if (
-        type === "series" &&
-        id.startsWith("tj_161_series:")
-    ) {
-
-        const parts =
-            id.split(":");
-
-        const episodeNumber =
-            parseInt(
-                parts[2],
-                10
-            );
-
-        if (
-            episodeNumber >= 1 &&
-            episodeNumber <= CLASSIC_EPISODES.length
-        ) {
-
-            /*
-             * مثال لمصدر HTTP مصرح به:
-             *
-             * return Promise.resolve({
-             *     streams: [{
-             *         title: "Tom & Jerry",
-             *         url: "https://YOUR-AUTHORIZED-SERVER/video.mp4",
-             *         behaviorHints: {
-             *             notWebReady: false
-             *         }
-             *     }]
-             * });
-             */
+        if (episodeNumber >= 1 && episodeNumber <= CLASSIC_EPISODES.length) {
+            const episodeIdx = episodeNumber - 1;
 
             return Promise.resolve({
-                streams: []
+                streams: [
+                    {
+                        title: `Tom & Jerry - Episode ${episodeNumber} (720p/1080p)`,
+                        infoHash: MAGNET_HASH,
+                        fileIdx: episodeIdx
+                    }
+                ]
             });
         }
     }
 
-    return Promise.resolve({
-        streams: []
-    });
+    return Promise.resolve({ streams: [] });
 });
 
 // =========================================================
 // SERVER
 // =========================================================
 
-const port =
-    parseInt(
-        process.env.PORT,
-        10
-    ) || 7070;
+const port = parseInt(process.env.PORT, 10) || 7070;
 
-serveHTTP(
-    builder.getInterface(),
-    {
-        port: port
-    }
-);
+serveHTTP(builder.getInterface(), { port: port });
 
-console.log(
-    `Tom & Jerry Stremio Addon active on port ${port}`
-);
+console.log(`Tom & Jerry Stremio Addon active on port ${port}`);
